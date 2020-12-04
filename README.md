@@ -14,7 +14,7 @@ TABAJARA requires the program hmmbuild (HMMER3 package - (http://hmmer.org/) to 
 
 # Usage
 
-tabajara.pl -i <input_file> -o <output_directory>
+Command line: tabajara.pl -i <input_file> -o <output_directory>
 
 Mandatory parameters:
 
@@ -101,7 +101,7 @@ P.S: All programs must be located in a directory listed in the PATH of the opera
 
 # Usage
 
-hmm-prospector.pl -d <file> -s|-e <decimal>  <optional parameters>
+Command line: hmm-prospector.pl -d <file> -s|-e <decimal>  <optional parameters>
   
 Mandatory parameters:
 
