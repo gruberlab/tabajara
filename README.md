@@ -140,6 +140,10 @@ perl hmm-prospector.pl -d <file> -s|-e <decimal>  <optional parameters>
 -v|version        : Version.
 ```
 
+# User manual
+
+# Tutorial
+
 # Contact
 
 To report bugs, to ask for help and to give any feedback, please contact Arthur Gruber (argruber@usp.br) or Liliane S. Oliveira (liliane.sntn@gmail.com).
