@@ -22,7 +22,7 @@ perl tabajara.pl -i <input_file> -o <output_directory>
   
 -fl|full_length <yes|no>                Use full-length sequence for model construction (default = no).
 
-##### IMPORTANT: When using -fl no (default), the following parameters are also mandatory:
+IMPORTANT: When using -fl no (default), the following parameters are also mandatory:
 
 -m|method <c|d>                         Method to select blocks. Options:
                                          c - Conservation
