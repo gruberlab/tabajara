@@ -82,7 +82,12 @@ IMPORTANT: When using -fl no (default), the following parameters are also mandat
 -v|version                              Version.
 
 -wg|discard_windows <yes|no>            Discard sliding windows presenting gaps (default = no).
+
 ``` 
+## User manual
+
+## Tutorial
+
 # HMM-prospector: A tool for surveying genomic and metagenomic data with profile HMMs
 
 HMM-Prospector is a Perl script that uses a single or multiple profile HMM file as a query in similarity searches against a FASTQ/FASTA dataset using hmmsearch program. HMM-Prospector processes the results and generates tabular files with qualitative and quantitative results. Previously run hmmsearch result files (short tabular format) can also be used as datasets.
@@ -113,7 +118,7 @@ perl hmm-prospector.pl -d <file> -s|-e <decimal>  <optional parameters>
 -d  <file>        : Dataset (FASTQ, FASTA or hmmsearch's tabular output file)
 ```
 
-### OPTIONAL PARAMETERS:
+### Optional parameters:
 
 ```
 -a                : Directory containing profile HMM annotations (valid only when using vFam models as input).
@@ -139,6 +144,9 @@ perl hmm-prospector.pl -d <file> -s|-e <decimal>  <optional parameters>
 
 -v|version        : Version.
 ```
+## User manual
+
+## Tutorial
 
 # Contact
 
