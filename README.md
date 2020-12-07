@@ -2,15 +2,15 @@
 
 TABAJARA is a computational tool for rational design of profile HMMs. Starting from a multiple sequence alignment (MSA), TABAJARA is able to find blocks that are either conserved across all sequences or discriminative for two specific groups of sequences. 
 
-#   Instalation
+##   Instalation
 
 Tabajara does not need to be installed. The user should only download the tabajara.pl file.
 
-# Requirements
+## Requirements
 
 TABAJARA requires the program hmmbuild (HMMER3 package - (http://hmmer.org/) to build profile HMMs. The program must be located in a directory listed in the PATH of the operating system.
 
-# Usage
+## Usage
 ```
 perl tabajara.pl -i <input_file> -o <output_directory>
 ```
@@ -87,11 +87,11 @@ IMPORTANT: When using -fl no (default), the following parameters are also mandat
 
 HMM-Prospector is a Perl script that uses a single or multiple profile HMM file as a query in similarity searches against a FASTQ/FASTA dataset using hmmsearch program. HMM-Prospector processes the results and generates tabular files with qualitative and quantitative results. Previously run hmmsearch result files (short tabular format) can also be used as datasets.
 
-#   Instalation
+## Instalation
 
 HMM-Prospector also does not need to be installed. The user should only download the hmm-prospector.pl file.
 
-# Requirements
+## Requirements
 
 - hmmsearch: HMMER3package-http://hmmer.org/. 
 
@@ -101,7 +101,7 @@ HMM-Prospector also does not need to be installed. The user should only download
 
 P.S: All programs must be located in a directory listed in the PATH of the operating system.
 
-# Usage
+## Usage
 
 ```
 perl hmm-prospector.pl -d <file> -s|-e <decimal>  <optional parameters>
