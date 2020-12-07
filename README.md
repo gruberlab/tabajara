@@ -11,18 +11,18 @@ Tabajara does not need to be installed. The user should only download the tabaja
 TABAJARA requires the program hmmbuild (HMMER3 package - (http://hmmer.org/) to build profile HMMs. The program must be located in a directory listed in the PATH of the operating system.
 
 # Usage
-
-Command line: perl tabajara.pl -i <input_file> -o <output_directory>
-
-Mandatory parameters:
-
+```
+perl tabajara.pl -i <input_file> -o <output_directory>
+```
+### Mandatory parameters:
+```
 -b|minimum_block_size <integer>         Minimum block size (must be ≥ w).
   
 -i|input_file <file name>               Input file (multiple alignment in FASTA or CLustal formats).
   
 -fl|full_length <yes|no>                Use full-length sequence for model construction (default = no).
 
-IMPORTANT: When using -fl no (default), the following parameters are also mandatory:
+##### IMPORTANT: When using -fl no (default), the following parameters are also mandatory:
 
 -m|method <c|d>                         Method to select blocks. Options:
                                          c - Conservation
@@ -33,10 +33,10 @@ IMPORTANT: When using -fl no (default), the following parameters are also mandat
 -p|percentage <integer>                 Percentage of positions in sliding window with score ≥ t.
 
 -w|window_size <integer>                Window size for block extraction.
+```
 
-
-Optional parameters:
-
+### Optional parameters:
+```
 -c|category <string>                    Name of major category to be analysed.
 
 -conf                                   Configuration file
@@ -82,7 +82,7 @@ Optional parameters:
 -v|version                              Version.
 
 -wg|discard_windows <yes|no>            Discard sliding windows presenting gaps (default = no).
-
+``` 
 # HMM-prospector: A tool for surveying genomic and metagenomic data with profile HMMs
 
 HMM-Prospector is a Perl script that uses a single or multiple profile HMM file as a query in similarity searches against a FASTQ/FASTA dataset using hmmsearch program. HMM-Prospector processes the results and generates tabular files with qualitative and quantitative results. Previously run hmmsearch result files (short tabular format) can also be used as datasets.
@@ -103,14 +103,19 @@ P.S: All programs must be located in a directory listed in the PATH of the opera
 
 # Usage
 
-Command line: hmm-prospector.pl -d <file> -s|-e <decimal>  <optional parameters>
-  
-Mandatory parameters:
+```
+perl hmm-prospector.pl -d <file> -s|-e <decimal>  <optional parameters>
+```  
 
+### Mandatory parameters:
+
+```
 -d  <file>        : Dataset (FASTQ, FASTA or hmmsearch's tabular output file)
+```
 
-OPTIONAL PARAMETERS:
+### OPTIONAL PARAMETERS:
 
+```
 -a                : Directory containing profile HMM annotations (valid only when using vFam models as input).
 
 -cpu              : Number of threads to be used by hmmsearch.
@@ -133,7 +138,7 @@ OPTIONAL PARAMETERS:
 		    parameters has been specified, the program will then use hmmsearch's default cutoff value (-E 10).
 
 -v|version        : Version.
-
+```
 
 # Contact
 
