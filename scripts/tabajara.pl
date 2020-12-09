@@ -118,32 +118,35 @@ GetOptions ("i|input_file=s"			=>\$input_file,
 
 $help_print = " 
 TABAJARA - a tool for rational design of profile HMMs
-(c) 2017. Liliane S. Oliveira & Arthur Gruber
+(c) 2020. Liliane S. Oliveira & Arthur Gruber
 Usage: tabajara.pl -i <input_file> -o <output_directory>
 
 Mandatory parameters:
--b|minimum_block_size <integer>    	Minimum block size (must be ≥ w).
 -i|input_file <file name>	 	Input file (multiple alignment in FASTA or CLustal formats).
--fl|full_length <yes|no>                Use full-length sequence for model construction (default = no).
+-m|method <c|d>                         Method to select blocks. Options:
+                                         c - Conservation
+                                         d - Discrimination
+
+NOTE: When using -m d, the parameter -c becomes mandatory, otherwise this parameter is optional:
+
+-c|category <string>                    Name of major category to be analysed.
 
 IMPORTANT:
 
 When using -fl no (default), the following parameters are also mandatory:
 
--m|method <c|d>  			Method to select blocks. Options:
-                			 c - Conservation
-                			 d - Discrimination
+-b|minimum_block_size <integer>         Minimum block size (must be ≥ w).
 -t|threshold <decimal>    		Threshold of the alignment position for block extraction  (valid values: 0 to 1).
 -p|percentage <integer>    		Percentage of positions in sliding window with score ≥ t.
 -w|window_size <integer>   		Window size for block extraction.
 
 
 Optional parameters:
--c|category <string>    		Name of major category to be analysed.
 -conf           			Configuration file
 -clean <yes|no>				Remove all intermediate files during the execution of Tabajara (default = yes).
 -cs|cutoff_score <yes|no>               Insert cutoff scores in the profile HMMs (default = no).
 -di|discard_sequences <yes|no>    	Discard identical sequences (default = no).
+-fl|full_length <yes|no>                Use full-length sequence for model construction (default = no).
 -gc|gap_cutoff <integer>   		Gap cutoff. Do not score columns that contain more than gap cutoff fraction gaps (default = 30).
 -gs|gap_sequence <decimal>   		Percentage of allowed gaps in each sequence.
 -hb|hmmbuild_parameters <string>    	Any set of hmmbuild's valid parameters can be entered under double quotes. 
