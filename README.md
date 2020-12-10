@@ -89,9 +89,13 @@ When using -fl no (default), the following parameters are also mandatory:
 -wg|discard_windows <yes|no>            Discard sliding windows presenting gaps (default = no).
 
 ``` 
-## User manual
-
 ## Tutorial
+Follow the instructions in the HMM-Prospector Manual file to learn how to use HMM-Prospector program and interpret the results.
+
+## Reference
+If you use this program for your publication, please cite:
+
+TABAJARA program (developed by Liliane S. Oliveira and Arthur Gruber, University of São Paulo, Brazil, unpublished).
 
 # Contact
 
