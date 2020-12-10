@@ -90,7 +90,7 @@ When using -fl no (default), the following parameters are also mandatory:
 
 ``` 
 ## Tutorial
-Follow the instructions in the Tabajara Manual file to learn how to use HMM-Prospector program and interpret the results.
+Follow the instructions in the Tabajara Manual file to learn how to use Tabajara program and interpret the results.
 
 ## Reference
 If you use this program for your publication, please cite:
