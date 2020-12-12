@@ -90,7 +90,7 @@ When using -fl no (default), the following parameters are also mandatory:
 
 ``` 
 ## Tutorial
-Follow the instructions in the Tabajara Manual file to learn how to use Tabajara program and interpret the results.
+Follow the instructions in the TABAJARA_manual.pdf file to learn how to use Tabajara program and interpret the results.
 
 ## Reference
 
