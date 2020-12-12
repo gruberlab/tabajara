@@ -93,9 +93,12 @@ When using -fl no (default), the following parameters are also mandatory:
 Follow the instructions in the Tabajara Manual file to learn how to use Tabajara program and interpret the results.
 
 ## Reference
+
 If you use this program for your publication, please cite:
 
-TABAJARA program (developed by Liliane S. Oliveira and Arthur Gruber, University of São Paulo, Brazil, unpublished).
+TABAJARA program (developed by Liliane S. Oliveira and Arthur Gruber, University
+of São Paulo, Brazil, manuscript in preparation; Ibrahim et al., 2018)
+Ibrahim, B. et al. (2018). Bioinformatics Meets Virology: The European Virus Bioinformatics Center's Second Annual Meeting. Viruses 10(5):256. doi: 10.3390/v10050256.
 
 ## Contact
 
