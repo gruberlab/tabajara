@@ -1,7 +1,5 @@
 #!/usr/bin/perl
 
-# tabajara.pl v. 1.0 (2020-11-24) A tool for rational design of profile HMMs
-
 use strict;
 use Getopt::Long;
 use File::Basename;
@@ -117,7 +115,7 @@ GetOptions ("i|input_file=s"			=>\$input_file,
 	    "cs|cutoff_score=s"			=>\$cutoff_score);
 
 $help_print = " 
-TABAJARA - a tool for rational design of profile HMMs
+TABAJARA - a tool for rational design of profile HMMs - $version ($last_update)
 (c) 2020. Liliane S. Oliveira & Arthur Gruber
 Usage: tabajara.pl -i <input_file> -o <output_directory>
 
@@ -181,8 +179,8 @@ if($version_option){
 }
 
 #
-# if configuration file is not defined, check if the mandatory arguments are defined (seed file and database file)
-#
+# if configuration file is not defined, check if the mandatory arguments are defined 
+#(seed file and database file)
 
 if (not defined $conf) {
     if(!$input_file){
@@ -216,8 +214,8 @@ if (not defined $conf) {
 }
 
 #
-# if configuration file is defined, check if the mandatory arguments are defined (seed file and database file)
-#
+# If configuration file is defined, check if all mandatory arguments are defined 
+
 my @strs = ();
 if ($conf) {
     print STDERR "Configuration file specified, command line options will be overridden.\n";
@@ -778,7 +776,7 @@ if(!$gap_cutoff){
     $gap_cutoff = 30;
 }
 
-# dictionary to map from amino acid to its row/column in a similarity matrix
+# Creates a matrix with amino acid counts to each alignment column 
 my %aa_to_index;
 my $count = 0;
 foreach my $aa (@amino_acids){
@@ -786,7 +784,7 @@ foreach my $aa (@amino_acids){
     $count++;
 }
 
-# creates the output directory
+# Creates the output directory
 my $caracter = substr $output, -1;
 if($caracter eq '/'){
     my $l = length($output);
@@ -799,8 +797,8 @@ $len = length($input_file);
 my $aux_name = substr $input_file, (rindex($input_file, "/") + 1), $len;
 $outfile_name = substr $aux_name, 0, index($aux_name, ".");
 
-################################################################################
-# Begin execution
+###############################################################################
+#                             Begin execution                                 #
 ###############################################################################
 
 $log = "logfile.txt";
@@ -811,7 +809,7 @@ my @aux_print = split(" ",$script_command);
 $script_command =~ s/$aux_print[0]/tabajara.pl/;
 print LOG "Command line:\n$script_command\n\n";
 
-# Verifies the composition of the fasta file (nucleotide or amino acid)
+# Check the composition (nucleotide or amino acid) of the fasta file 
 print LOG "Sequence type: ";
 if($file_type == 1){
     print LOG "DNA\n";
@@ -820,7 +818,7 @@ else{
     print LOG "Protein\n";
 }
 
-# Verifies the method to be used in the analysis (c - conservative; d - discriminative)
+# Verifies the method to be used in the analysis (c - Conservation; d - Discrimination)
 print LOG "\n-m Method: ";
 if(lc($measure) eq "d" ){
     if(!$cat){
@@ -1024,9 +1022,9 @@ my @names = ();
 my @alignment = ();
 my @seq_weigths = ();
 
-# Reading the aligment file
+# Reads the aligment file
 
-# Identifies the type of aligment file (fasta or clustal format)
+# Identifies the format of the alignment file (fasta or clustal)
 my $t = verify_file_type($input_file);
 my $aux1;
 my $aux2;
@@ -1069,7 +1067,7 @@ print LOG "Pre-processing:\n";
 
 if(lc($remove_redundance) eq "yes"){
 
-    #Removing redundant sequences in the aligment file
+    #Removes redundant sequences from the aligment file
 
     my $count;
     $no_red .="_no_redundancy";
@@ -1109,7 +1107,7 @@ else{
     }
 }
 
-# Generates a file containing no aligned sequences for the validation step
+# Generates a file containing unaligned FASTA sequences for the validation step
 my $raw_file = $output."/".$outfile_name."_validation_file.fasta";
 open(FASTA, ">$raw_file");
 for(my $i = 0; $i < scalar(@names); ++$i){
@@ -1120,7 +1118,7 @@ for(my $i = 0; $i < scalar(@names); ++$i){
 }
 close(FASTA);
 
-# Removing gap only columns from the aligment
+# Removes gap-only columns from the aligment
 
 my @matrix = @{$aux3};
 my $size = scalar(@matrix);
@@ -1180,7 +1178,7 @@ for($i = 1; $i < scalar(@alignment); ++$i){
     }
 }
 
-# Assigning weight for the alignment (if use_seq_weights option is true)
+# Assigns weight for the alignment (if use_seq_weights option is true)
 
 if(lc($use_seq_weights) eq 'true'){
     my $wei_file = $input_file;
@@ -1200,19 +1198,6 @@ if(scalar(@seq_weights) != scalar(@alignment)){
     $len = scalar(@alignment);
     for($i = 1; $i < $len; ++$i){
 	$seq_weights[$i] = 1 * $len;
-    }
-}
-
-# handle print of output relative to specific sequence
-
-my $ref_seq_num = undef;
-if ($seq_specific_output){
-    my $index = index_of(\@names, $seq_specific_output);
-    if($index == -1){
-    	print STDERR "Sequence $seq_specific_output not found in alignment. Using default output format...\n";
-    }
-    else{ 
-    	$ref_seq_num = $index; 
     }
 }
 
@@ -1271,14 +1256,14 @@ if(lc($full_length) eq "yes"){
             die "ERROR: Could not run hmmbuild: hmmbuild $hmmbuild $hmm $input_file\n";
         }
 
-	#Validation of the generated model
+	# Validation of the generated model
         hmmValidation_conservation($hmm_dir, scalar(@alignment), $raw_file, $file_type, \@categories, \@amount);
 	
 	if($clean eq "yes"){
             system "rm -rf $hmm_dir/excluded_HMMs";
     	}
     }
-    elsif(lc($measure) eq "d"){ # Discriminative mode
+    elsif(lc($measure) eq "d"){ # Discrimination mode
         my $hmm_dir = $output."/hmms";
         if(!-e $hmm_dir){
             system "mkdir $hmm_dir";
@@ -1326,7 +1311,7 @@ if(lc($full_length) eq "yes"){
                     die "ERROR: Could not run hmmbuild: hmmbuild $hmmbuild $hmm $aln_cat_file\n";
             	}
 
-		#Validation of the generated models
+		# Validation of the generated models
             	hmmValidation($hmm_dir, $category, $count_cat, $raw_file, $file_type);
 	    }
 	    else{
@@ -1339,7 +1324,7 @@ if(lc($full_length) eq "yes"){
 else{ 
     # Generates short profile HMMs
 
-    if(lc($measure) eq "d"){ #Discriminative mode
+    if(lc($measure) eq "d"){ # Discrimination mode
     	my $blocks = $output."/blocks";
     	system "mkdir $blocks";
     	my $fastas_dir = $blocks."/original";
@@ -1364,7 +1349,7 @@ else{
             	print LOG "\n\nCategory: $category\n";
             }
 
-    	    # Blocks selection by MI method
+    	    # Blocks selection by Mutual Information (MI) method
 
     	    print LOG "\nAnalysis by MI: \n";
     	    my $fastas_mi = $fastas_dir."/MI"; 
@@ -1372,7 +1357,7 @@ else{
 	    my $aux_scores_mi;
 	    my $aux_gaps_only;
 
-	    # Calculates scores for all position using MI method
+	    # Calculates scores for all positions using MI method
     	    
 	    ($aux_scores_mi, $aux_gaps_only) = mi(\@names, \@alignment, $gap_cutoff, $category);
 	    if($aux_scores_mi == -1){
@@ -1381,7 +1366,7 @@ else{
     	    my @scores_mi = @{$aux_scores_mi};
 	    my @gaps_only = @{$aux_gaps_only};
 
-	    # Selecting the best blocks
+	    # Selects the best blocks
 	    my ($aux11, $aux12) = select_valid_blocks_disc(\@scores_mi, \@gaps_only, $threshold, $window_size, 1, $num_cat);
 
     	    @valid_blocks_mi = @{$aux12};
@@ -1432,7 +1417,7 @@ else{
             	print LOG "Blocks selected by MI: $n \n\n";
 	    }	
 
-	    # Blocks selection by SH method
+	    # Blocks selection by Sequence Harmony (SH) method
 	    
             print LOG "Analysis by SH: \n\n";
     	    my $fastas_sh = $fastas_dir."/SH";
@@ -1675,7 +1660,7 @@ else{
 			    	my ($count, $aux_name, $aux_seqs) = remove_redundancy(\@new_names, \@new_seqs2, undef);
                 	    	@new_names = @{$aux_name};
                 	    	@new_seqs2 = @{$aux_seqs};
-			    	my $nseq = scalar(@new_names); #`grep -c ">" $seq_without_red`;
+			    	my $nseq = scalar(@new_names); 
         		    	my $min_nseq = 2;
         		    	if(defined $amount){
             	 	    	    $min_nseq = $amount;
@@ -1696,7 +1681,7 @@ else{
 		    	    
 			    print LOG "\n";
 			    
-			    # Try to select other regions 
+			    # Tries to select other regions 
                 	    
 			    if(lc($more_blocks) eq "yes"){
                     	    	print LOG "Trying to select more subregions:\n";
@@ -1810,7 +1795,7 @@ else{
 	    print STDERR "Blocks selected by MI+SH: $qnt\n";
             print LOG "Blocks selected by MI+SH: $qnt\n";
 	    
-	    # Profile HMMs construction
+	    # Profile HMM construction
 	    my ($aux_final, $msg) = createHMMs($without_red, $hmms_dir, $measure, $category);
 	    @final = @{$aux_final};
 	    if(defined $msg){
@@ -1827,7 +1812,7 @@ else{
             	}
             }
 
-	    # Profile HMMs validation
+	    # Profile HMM validation
 	    
 	    @final = @{hmmValidation($hmms_dir, $category, $count_cat, $raw_file, $file_type)};
     	    @final = sort { $a <=> $b } @final;
@@ -1896,7 +1881,7 @@ else{
                     }
             	}
 
-    	    	#Updating scores for window size
+    	    	# Updates scores for window size
     	    	
 		if($window_size_score > 0){
     	    	    my $aux_scores = window_score(\@scores, $window_size_score, $win_lam);
@@ -1905,7 +1890,7 @@ else{
     	    	}  
     	   }
     	}
-        # Normalize scores if the normalize_scores option is true
+        # Normalizes scores if the normalize_scores option is true
         
 	# Selection of the best blocks
         
@@ -1977,7 +1962,7 @@ else{
         my $hmms_dir = $output."/hmms";
         system "mkdir $hmms_dir";
 
-	# Profile HMMs construction
+	# Profile HMM construction
 	
         my ($aux_final, $msg) = createHMMs($without_red, $hmms_dir, $measure, $category);
         if(defined $msg){
@@ -1986,7 +1971,7 @@ else{
     	    exit;
     	}
 
-	# Profile HMMs validation
+	# Profile HMM validation
 	 
     	@final = @{hmmValidation_conservation($hmms_dir, scalar(@alignment), $raw_file, $file_type, \@categories, \@amount)};
     	@final = sort { $a <=> $b } @final;
@@ -2028,11 +2013,11 @@ if($clean eq "yes"){
 close(LOG);
 
 ################################################################################
-# Subroutines
+#                                   Subroutines                                #
 ################################################################################ 
 
 ################################################################################
-# Frequency Count and Gap Penalty
+#                            Frequency Count and Gap Penalty                   #
 ################################################################################
 
 sub weighted_freq_count_pseudocount{
@@ -2079,7 +2064,7 @@ sub weighted_freq_count_pseudocount{
 
 
 ################################################################################
-# Read clustal alignment
+#                              Reads Clustal alignment                          #
 ################################################################################
 sub read_clustal_alignment{
     my $file = shift;
@@ -2130,7 +2115,7 @@ sub read_clustal_alignment{
 }
 
 ################################################################################
-# Read fasta alignment
+#                               Read FASTA alignment                           #
 ################################################################################
 sub read_fasta_alignment_short{
     my $file = shift;
@@ -2204,7 +2189,7 @@ sub read_fasta_alignment{
 }
 
 ################################################################################
-# Load sequence weights
+#                             Loads sequence weights                           #
 ################################################################################
 sub load_sequence_weights{
     my $file = shift;
@@ -2215,7 +2200,7 @@ sub load_sequence_weights{
 }
 
 ################################################################################
-# Calculate sequence weights
+#                             Calculates sequence weights                      #
 ################################################################################
 sub calculate_sequence_weights{
     my @msa = @_;
@@ -2231,7 +2216,7 @@ sub calculate_sequence_weights{
     my @freq_counts;
     my @aux = ();
 
-    #Constructs a matrix from the alignment sequences
+    # Constructs a matrix from the alignment sequences
     
     for($i = 0; $i < $length; ++$i){
 	my @seq = split("", $msa[$i]);
@@ -2269,7 +2254,7 @@ sub calculate_sequence_weights{
 }
 
 ################################################################################
-# Returns the index of an element contained in an array.
+#             Returns the index of an element contained in an array            #
 ################################################################################
 sub index_of{
     my ($array, $element) = @_;
@@ -2285,7 +2270,7 @@ sub index_of{
 }
 
 ################################################################################
-# Returns the elements of an alignment column.
+#                Returns the elements of an alignment column                   #
 ################################################################################
 sub get_column{
     my ($index, $array) = @_;
@@ -2302,7 +2287,7 @@ sub get_column{
 }
 
 ################################################################################
-# Calculates the gap percentage of a column.
+#                Calculates the gap percentage of a column                     #
 ################################################################################
 sub gap_percentage{
     my $aux = shift;
@@ -2318,7 +2303,7 @@ sub gap_percentage{
 }
 
 ################################################################################
-# Calculates of Jensen-Shannon Divergence for a column
+#           Calculates of Jensen-Shannon Divergence for each column            #
 ################################################################################
 sub js_divergence{
     my ($aux_col, $aux_dist, $aux_wei, $gap_penalty) = @_;
@@ -2379,7 +2364,7 @@ sub js_divergence{
 }
 
 ################################################################################
-# Calculates the Shannon entropy for each column of the alignment.
+#        Calculates the Shannon entropy for each column of the alignment       #
 ################################################################################
 sub shannon_conservation{
    my $aux = shift;
@@ -2424,8 +2409,8 @@ sub shannon_conservation{
     return \@entropy;
 }
 
-#################################################################################
-# Calculates log 2 of a number.
+################################################################################
+#                           Calculates log2 of a number                        #  
 ################################################################################
 sub log2{
     my $number = shift;
@@ -2435,7 +2420,7 @@ sub log2{
 }
 
 ################################################################################
-# Calculates weighted gap penalty
+#                           Calculates weighted gap penalty                    #
 ################################################################################
 sub weighted_gap_penalty{
     my ($aux_col, $aux_wei) = @_;
@@ -2468,7 +2453,7 @@ sub weighted_gap_penalty{
 }
 
 ################################################################################
-# Calculates the sum of array elements
+#                     Calculates the sum of array elements                     #
 ################################################################################
 sub sum_arrays{
     my $aux_array = shift;
@@ -2483,7 +2468,7 @@ sub sum_arrays{
 }
 
 ################################################################################
-# Calculates window scores 
+#                                Calculates window scores                      #
 ################################################################################
 sub window_score{
     my ($aux_score, $window_len, $lam) = @_;
@@ -2510,7 +2495,7 @@ sub window_score{
 }
 
 ################################################################################
-# Calculates z-scores
+#                             Calculates z-scores                              #
 ################################################################################
 sub calc_z_scores{
     #score_cutoff are not included.
@@ -2551,10 +2536,11 @@ sub calc_z_scores{
     return \@z_scores;
 }
 
-#########################################################################################################
-# Checks if a directory with the given output name already exists. 
-# If so, a numeric suffix is added to the name.
-#########################################################################################################
+###################################################################################
+# Checks if a directory with the given output name already exists. If so, a numeric
+# suffix is added to the name.
+###################################################################################
+
 sub output_dir_name {
     my $output_dir_name = shift;
     my $count = 2;
@@ -2570,9 +2556,10 @@ sub output_dir_name {
     return ($output_dir_name);
 }
 
-#########################################################################################################
-# Verifies type of a input file.
-########################################################################################################
+####################################################################################
+#                          Verifies the type of input file                         #
+####################################################################################
+
 sub verify_file_type{
     my $file = shift;
     open(FILE, $file);
@@ -2587,9 +2574,9 @@ sub verify_file_type{
     return 0;
 }
 
-#########################################################################################################
-# Calculates Mutual information for each position of the alignment
-########################################################################################################
+######################################################################################
+#         Calculates Mutual information for each position of the alignment           #
+######################################################################################
 
 sub mi{
     my $aux1 = shift;
@@ -2748,9 +2735,10 @@ sub mi{
     return \@values, \@gaps_only;	
 }
 
-#########################################################################################################
-# Calculates Sequence Harmony for each position of the alignment
-########################################################################################################
+####################################################################################
+#         Calculates Sequence Harmony for each position of the alignment           #
+####################################################################################
+
 sub sh{
     my $aux1 = shift;
     my $aux2 = shift;
@@ -2893,9 +2881,10 @@ sub sh{
     return \@entropy, \@gaps_only;
 }
 
-#########################################################################################################
-# Initialization of a protein frequency vector
-########################################################################################################
+######################################################################################
+#                 Initialization of a protein frequency vector                       #
+######################################################################################
+
 sub initialize_protein{
     my %hash = (
            "A" => 0,
@@ -2923,9 +2912,10 @@ sub initialize_protein{
     return \%hash;
 }
 
-#########################################################################################################
-# Initialization of a nucleotide frequency vector
-########################################################################################################
+#####################################################################################
+#                Initialization of a nucleotide frequency vector                    #
+#####################################################################################
+
 sub initialize_DNA{
     my %hash = (
            "A" => 0,
@@ -2937,9 +2927,10 @@ sub initialize_DNA{
     return \%hash;
 }
 
-#########################################################################################################
-# Calculates the highest value in a set of values.
-########################################################################################################
+#####################################################################################
+#                  Calculates the highest value in a set of values                  #
+#####################################################################################
+
 sub largest_score{
     my $aux = shift;
     my @array = @{$aux};
@@ -2952,17 +2943,19 @@ sub largest_score{
     return $largest;
 }
 
-#########################################################################################################
-# Verifies if a value is uniq.
-########################################################################################################
+#####################################################################################
+#                             Verifies if a value is unique                         #
+#####################################################################################
+
 sub uniq {
     my %seen;
     grep !$seen{$_}++, @_;
 }
 
-#########################################################################################################
-# Verifies the content of a input fasta file (nucleotide or amino acid sequences)
-########################################################################################################
+#####################################################################################
+#  Verifies the content of a input FASTA file (nucleotide or amino acid sequences)  #
+#####################################################################################
+
 sub verifyFileType{
     my $file = shift;
     my $count = 0;
@@ -3050,9 +3043,11 @@ sub verifyFileType{
     return $type;
 }
 
-#########################################################################################################
-# Prints the scores of each position of a alignment in a tabular file (conservation mode). 
-########################################################################################################
+##########################################################################################
+#        Prints the scores of each position of a alignment in a tabular file             #
+#                                 (Conservation mode)                                    # 
+##########################################################################################
+
 sub printFileOnlyOption {
     my $out_file = shift;
     my $values = shift;
@@ -3073,9 +3068,11 @@ sub printFileOnlyOption {
     close(FILE);
 }
 
-#########################################################################################################
-# Prints the scores of each position of a alignment in a tabular file (discriminative mode).
-########################################################################################################
+##########################################################################################
+#         Prints the scores of each position of a alignment in a tabular file            #
+#                                (Discrimination mode)                                   #
+##########################################################################################
+
 sub printFileMOption {
     my $out_file = shift;
     my $values_mi_sh = shift;
@@ -3101,9 +3098,10 @@ sub printFileMOption {
     close(FILE);
 }
 
-#########################################################################################################
-# Selects valid blocks of the aligment based on the calculated scores.
-########################################################################################################
+##########################################################################################
+#           Selects valid blocks of the aligment based on the calculated scores          #
+##########################################################################################
+
 sub select_valid_blocks{
     my $aux_array = shift;
     my $thre = shift;
@@ -3190,9 +3188,10 @@ sub select_valid_blocks{
     return (\@values_v, \@valid_blocks_m);
 }
 
-#########################################################################################################
-# Selects valid blocks of the aligment based on the calculated scores (discriminative mode)
-########################################################################################################
+##########################################################################################
+#           Selects valid blocks of the aligment based on the calculated scores          #
+##########################################################################################
+
 sub select_valid_blocks_disc{
     my $aux_array = shift;
     my $aux_gap_only = shift;
@@ -3208,7 +3207,7 @@ sub select_valid_blocks_disc{
         push @values_v, $v_scores[$i];
     }
 
-    #Select valid windows
+    # Select valid windows
     my $len_values = scalar(@values_v);
     my $start;
     my $end;
@@ -3293,9 +3292,10 @@ sub select_valid_blocks_disc{
     return (\@values_v, \@valid_blocks_m);
 }
 
-#########################################################################################################
-# Joins alignment blocks found by MI and SH methods
-########################################################################################################
+##########################################################################################
+#              Joins alignment blocks found by the MI and SH methods                     #
+##########################################################################################
+
 sub blocks_union{
     my $mi = shift;
     my $sh = shift;
@@ -3471,9 +3471,10 @@ sub blocks_union{
     }
 }
 
-#########################################################################################################
-# Identifies blocks intersection between MI and SH.
-########################################################################################################
+##########################################################################################
+#              Identifies block intersection between MI and SH methods                   #
+##########################################################################################
+
 sub setsIntersection{
     my $set1 = shift;
     my $set2 = shift;
@@ -3518,9 +3519,10 @@ sub setsIntersection{
     return \@final;
 }
 
-#########################################################################################################
-# Removes redundant sequences in a block
-########################################################################################################
+##########################################################################################
+#                        Removes redundant sequences in a block                          #
+##########################################################################################
+
 sub remove_redundancy{
     my $aux1 = shift;
     my $aux2 = shift;
@@ -3568,9 +3570,10 @@ sub remove_redundancy{
     return $count, \@aux_nms, \@alns;
 }
 
-#########################################################################################################
-# Removes redundant sequences in a MSA
-########################################################################################################
+##########################################################################################
+#                          Removes redundant sequences in a MSA                          #
+##########################################################################################
+
 sub remove_redundancy_MSA{
     my $aux1 = shift;
     my $aux2 = shift;
@@ -3604,9 +3607,10 @@ sub remove_redundancy_MSA{
     return $count, \@aux_names, \@aux_seqs, \@matrix;
 }
 
-#########################################################################################################
-# Calculates identity percentage between two sequences.
-########################################################################################################
+##########################################################################################
+#                Calculates identity percentage between two sequences                    #
+##########################################################################################
+
 sub calculate_identity{
     my $aux1 = shift;
     my $aux2 = shift;
@@ -3627,9 +3631,10 @@ sub calculate_identity{
     }
 }
 
-#########################################################################################################
-# Joins blocks within a maximum allowable distance.
-########################################################################################################
+##########################################################################################
+#                    Joins blocks within a maximum allowable distance                    #
+##########################################################################################
+
 sub interval_union{
     my $aux = shift;
     my $length = shift;
@@ -3688,9 +3693,10 @@ sub interval_union{
     return \@final_blocks;
 }
 
-#########################################################################################################
-# Removes ends of blocks with gaps 
-########################################################################################################
+##########################################################################################
+#                            Removes ends of blocks with gaps                            #
+##########################################################################################
+
 sub trimming_zeros{
     my $start = shift;
     my $end = shift;
@@ -3706,9 +3712,10 @@ sub trimming_zeros{
     return $start, $end;
 }
 
-#########################################################################################################
-# Removes columns composed only by gaps
-########################################################################################################
+##########################################################################################
+#                                Removes gaps-only columns                               #
+##########################################################################################
+
 sub trimming_gaps_only{
     my $start = shift;
     my $end = shift;
@@ -3724,9 +3731,10 @@ sub trimming_gaps_only{
     return $start, $end;
 }
 
-#########################################################################################################
-# Removes zero score columns
-########################################################################################################
+##########################################################################################
+#                                 Removes zero-score columns                             #
+##########################################################################################
+
 sub eliminate_zeros{
     my $aux_b = shift;
     my $aux_v = shift;
@@ -3753,9 +3761,10 @@ sub eliminate_zeros{
     return \@new_blocks;
 }
 
-#########################################################################################################
-# Selects the best regions within a previously selected region.
-########################################################################################################
+##########################################################################################
+#              Selects the best regions within a previously selected region              #
+##########################################################################################
+
 sub select_max_blocks{
     my $aux_b = shift;
     my $aux_v = shift;
@@ -3843,9 +3852,10 @@ sub select_max_blocks{
     return \@final_blocks;
 }
 
-#########################################################################################################
-# Creates fasta files from selected blocks
-########################################################################################################
+##########################################################################################
+#                       Creates FASTA files from selected blocks                         #
+##########################################################################################
+
 sub createOriginalBlocksFiles{
     my $dir = shift;
     my $aux_blocks = shift;
@@ -3911,9 +3921,10 @@ sub createOriginalBlocksFiles{
     return \@valid_blocks;
 }
 
-#########################################################################################################
-# Creates fastas from the selected blocks after cleaning
-########################################################################################################
+##########################################################################################
+#              Creates FASTA files from the selected blocks after cleaning               #
+##########################################################################################
+
 sub createFinalBlocksByOriginal{
     my $original_dir = shift;
     my $withoutRed_dir = shift;
@@ -3953,7 +3964,7 @@ sub createFinalBlocksByOriginal{
     	else{
   	     my $pos = rindex($file, ".");
              my $prefix = substr $file, 0, ($pos);
-             #Aligning sequences to calculate their distance matrix
+             # Aligning sequences to calculate their distance matrix
              $file = $original_dir."/".$file;
              my $start = 0;
              my $seq = "";
@@ -4023,8 +4034,8 @@ sub createFinalBlocksByOriginal{
             	print OUT ">$nms[$i]\n$seqs[$i]\n";
             }
             close(OUT);
-            #Aligning non-redundant sequences
-            my $nseq = scalar(@nms); #`grep -c ">" $seq_without_red`;
+            # Aligning non-redundant sequences
+            my $nseq = scalar(@nms); 
             my $min_nseq = 2;
             if(defined $amount){
             	$min_nseq = $amount;
@@ -4114,7 +4125,7 @@ sub createFinalBlocksByOriginal{
                             }
                 	}
 		    }
-		    my $nseq = scalar(@aux_names); #`grep -c ">" $seq_without_red`;
+		    my $nseq = scalar(@aux_names); 
                     my $min_nseq = 2;
                     if(defined $amount){
                         $min_nseq = $amount;
@@ -4148,9 +4159,10 @@ sub createFinalBlocksByOriginal{
 }
 
 
-#########################################################################################################
-# Generates profile HMMs
-########################################################################################################
+##########################################################################################
+#                                Generates profile HMMs                                  #
+##########################################################################################
+
 sub createHMMs{
     my $aln_dir = shift;
     my $hmms_dir = shift;
@@ -4201,9 +4213,10 @@ sub createHMMs{
     return (\@final_coord, $msg); 
 }
 
-#########################################################################################################
-# Profile HMMs validation (discriminative mode)
-########################################################################################################
+##########################################################################################
+#                    Profile HMMs validation (Discrimination mode)                       #
+##########################################################################################
+
 sub hmmValidation{
     my $hmm_dir = shift;
     my $category = shift;
@@ -4490,9 +4503,10 @@ sub hmmValidation{
     return \@regions;
 }
 
-#########################################################################################################
-# Profile HMMs validation (conservation mode)
-########################################################################################################
+##########################################################################################
+#                      Profile HMMs validation (Conservation mode)                       #
+##########################################################################################
+
 sub hmmValidation_conservation{
     my $hmm_dir = shift;
     my $num_cat = shift;
@@ -4500,8 +4514,8 @@ sub hmmValidation_conservation{
     my $seq_type = shift;
     my $categ = shift;
     my $am = shift;
-    my @cats; #= @{$cat};
-    my @amount;# = @{$am};
+    my @cats; 
+    my @amount;
     if(defined $categ){
 	@cats = @{$categ};
 	@amount = @{$am};
@@ -4756,9 +4770,10 @@ sub hmmValidation_conservation{
     return \@regions;
 }
 
-#########################################################################################################
-# Creates fastas from the best selected sub-regions
-########################################################################################################
+##########################################################################################
+#                Creates FASTA files from the best selected sub-regions                  #
+##########################################################################################
+
 sub createFinalBlocksSelectingBestRegion{
     my $original_dir = shift;
     my $aux_values = shift;
@@ -4836,7 +4851,7 @@ sub createFinalBlocksSelectingBestRegion{
 	my ($count, $aux_name, $aux_seqs) = remove_redundancy(\@names, \@alignment, undef);
         @names = @{$aux_name};
         @alignment = @{$aux_seqs};
-	my $nseq = scalar(@names); #`grep -c ">" $seq_without_red`;
+	my $nseq = scalar(@names); 
         my $min_nseq = 2;
         if(defined $amount){
             $min_nseq = $amount;
@@ -4875,7 +4890,7 @@ sub createFinalBlocksSelectingBestRegion{
         if($size > $max_block_size){
 	    my ($as, $ae) = selectBestRegion($start, $end, \@value, $count, \@gaps_only);
             my ($a, $e) = trimming_zeros(($as-1), ($ae-1), \@value, $min_size_block);
-	    #remove redundant sequences
+	    # Removes redundant sequences
 	    my ($count, $aux_name, $aux_seqs) = remove_redundancy(\@names, \@alignment, undef);
             @names = @{$aux_name};
             @alignment = @{$aux_seqs};
@@ -5043,7 +5058,7 @@ sub createFinalBlocksSelectingBestRegion{
 		my ($count, $aux_name, $aux_seqs) = remove_redundancy(\@names, \@alignment, undef);
 		@names = @{$aux_name};
 		@alignment = @{$aux_seqs};
-		my $nseq = scalar(@names); #`grep -c ">" $seq_without_red`;
+		my $nseq = scalar(@names); 
         	my $min_nseq = 2;
         	if(defined $amount){
             	    $min_nseq = $amount;
@@ -5060,7 +5075,7 @@ sub createFinalBlocksSelectingBestRegion{
                     my $str = substr $alignment[$k], $aux_start, $len;
 		    $new_seqs[$k] = $str;
 		}
-		#Remove gap-only columns
+		# Removes gap-only columns
 		my $len = length($new_seqs[0]);
                 my $size = scalar(@new_seqs);
                 for(my $k = 0; $k < $len; ++$k){
@@ -5083,7 +5098,7 @@ sub createFinalBlocksSelectingBestRegion{
   		my ($count, $aux_name, $aux_seqs) = remove_redundancy(\@names, \@new_seqs, undef);
                 @names = @{$aux_name};
                 @new_seqs = @{$aux_seqs};
-		my $nseq = scalar(@names); #`grep -c ">" $seq_without_red`;
+		my $nseq = scalar(@names); 
         	my $min_nseq = 2;
         	if(defined $amount){
             	    $min_nseq = $amount;
@@ -5168,9 +5183,10 @@ sub createFinalBlocksSelectingBestRegion{
     }
     print LOG "\n";
 }
-#########################################################################################################
-# Generates the final files
-########################################################################################################
+##########################################################################################
+#                               Generates the final files                                #
+##########################################################################################
+
 sub generateFinalFiles{
     my $aux_blocks = shift;
     my $aux_values = shift;
@@ -5215,9 +5231,10 @@ sub generateFinalFiles{
 
 }
 
-#########################################################################################################
-# Generates the final files
-########################################################################################################
+##########################################################################################
+#                               Generates the final files                                #
+##########################################################################################
+
 sub generateFinalFilesMix{
     my $aux_blocks = shift;
     my $aux_blocks_mi = shift;
@@ -5306,9 +5323,10 @@ sub generateFinalFilesMix{
     printFileMOption($file, \@scores, \@mi_v, \@sh_v, \@valid_blocks);
 }
 
-#########################################################################################################
-# Selects the best sub-region from an alignment region
-########################################################################################################
+##########################################################################################
+#                 Selects the best sub-region from an alignment region                   #
+##########################################################################################
+
 sub selectBestRegion{
     my $start = shift;
     my $end = shift;
@@ -5377,9 +5395,10 @@ sub selectBestRegion{
     }
 }
 
-#########################################################################################################
-# Selects sequences from a alignment
-########################################################################################################
+##########################################################################################
+#                        Selects sequences from a alignment                              #
+##########################################################################################
+
 sub selectSequences{
     my $aux_aln = shift;
     my $start = shift;
@@ -5422,9 +5441,10 @@ sub selectSequences{
     return \@new_seqs; 
 }
 
-#########################################################################################################
-# Verifies if a vector contains a value 
-########################################################################################################
+##########################################################################################
+#                         Verifies if a vector contains a value                          #
+##########################################################################################
+
 sub contains {
     my $num = shift;
     my $aux = shift;
@@ -5437,9 +5457,10 @@ sub contains {
     return 0;
 }
 
-#########################################################################################################
-# Calculates the gap percentage 
-########################################################################################################
+##########################################################################################
+#                                Calculates the gap percentage                           #
+##########################################################################################
+
 sub calculateGapPercentage{
     my $aux_names = shift;
     my $aux_alns = shift;
@@ -5497,9 +5518,10 @@ sub calculateGapPercentage{
     return \@aux_n, \@aux_s;
 }
 
-#########################################################################################################
-# Searchs for more sub-regions in a selected alignment block.
-########################################################################################################
+##########################################################################################
+#                Searchs for more sub-regions in a selected alignment block              #
+##########################################################################################
+
 sub searchForMoreRegions{
     my $original_start = shift;
     my $original_end = shift;
@@ -5524,9 +5546,10 @@ sub searchForMoreRegions{
     return \@aux;
 }
 
-#########################################################################################################
-# Searches recursively for regions
-########################################################################################################
+##########################################################################################
+#                              Searches recursively for regions                          #
+##########################################################################################
+
 sub searchRecursively{
     my $original_start = shift;
     my $original_end = shift;
@@ -5605,9 +5628,10 @@ sub searchRecursively{
     }
 }
 
-#########################################################################################################
-# Sort blocks coordinates
-########################################################################################################
+##########################################################################################
+#                                  Sort block coordinates                               #
+##########################################################################################
+
 sub sortCoordinates{
     my $aux_vector = shift;
     my @vector = @{$aux_vector};
@@ -5634,9 +5658,10 @@ sub sortCoordinates{
     return \@vector;
 }
 
-#########################################################################################################
-# Generates a fosta file from a set of sequences.
-########################################################################################################
+##########################################################################################
+#                         Generates a FASTA file from a set of sequences                 #
+##########################################################################################
+
 sub generateRegion{
     my $original_start = shift;
     my $original_end = shift;
@@ -5714,9 +5739,10 @@ sub generateRegion{
     return 0; 	
 }
 
-#########################################################################################################
-# Selects gap only coluns
-########################################################################################################
+##########################################################################################
+#                               Selects gap-only columns                                 #
+##########################################################################################
+
 sub get_gapOnly{
    my $aux = shift;
    my @seqs = @{$aux};
