@@ -180,7 +180,6 @@ if($version_option){
 
 #
 # if configuration file is not defined, check if the mandatory arguments are defined 
-#(seed file and database file)
 
 if (not defined $conf) {
     if(!$input_file){
@@ -213,7 +212,6 @@ if (not defined $conf) {
     }
 }
 
-#
 # If configuration file is defined, check if all mandatory arguments are defined 
 
 my @strs = ();
