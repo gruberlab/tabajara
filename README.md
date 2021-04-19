@@ -96,8 +96,7 @@ Follow the instructions in the TABAJARA_manual.pdf file to learn how to use Taba
 
 If you use this program for your publication, please cite:
 
-TABAJARA program (developed by Liliane S. Oliveira and Arthur Gruber, University
-of São Paulo, Brazil, manuscript in preparation; Ibrahim et al., 2018)
+Oliveira, L.S. and Gruber, A. (2021) Rational design of profile HMMs for viral classification and discovery. In Nakaya, H. (Ed.), Bioinformatics. Exon Publications, Brisbane, Australia, pp. 151-170.
 
 Ibrahim, B. et al. (2018). Bioinformatics Meets Virology: The European Virus Bioinformatics Center's Second Annual Meeting. Viruses 10(5):256. doi: 10.3390/v10050256.
 
