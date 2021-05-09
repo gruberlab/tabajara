@@ -96,7 +96,7 @@ Follow the instructions in the TABAJARA_manual.pdf file to learn how to use Taba
 
 If you use this program for your publication, please cite:
 
-Oliveira, L.S. and Gruber, A. (2021) Rational design of profile HMMs for viral classification and discovery. In Nakaya, H. (Ed.), Bioinformatics. Exon Publications, Brisbane, Australia, pp. 151-170.
+Oliveira, L.S. and Gruber, A. (2021) <a href="https://doi.org/10.36255/exonpublications.bioinformatics.2021.ch9">Rational design of profile HMMs for viral classification and discovery</a>. In Nakaya, H. (Ed.), Bioinformatics. Exon Publications, Brisbane, Australia, pp. 151-170.
 
 Ibrahim, B. et al. (2018). Bioinformatics Meets Virology: The European Virus Bioinformatics Center's Second Annual Meeting. Viruses 10(5):256. doi: 10.3390/v10050256.
 
