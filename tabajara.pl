@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 
+# tabajara.pl - A tool for rational design of profile HMMs
+# v1.01: Removing unecessary comments.
+
 use strict;
 use Getopt::Long;
 use File::Basename;
@@ -16,8 +19,8 @@ foreach (@ARGV) {
 }
 
 #variables
-my $version = "1.0";
-my $last_update = "2020-11-22";
+my $version = "1.01";
+my $last_update = "2021-05-23";
 my $version_option;
 my $window_size_score;
 my $win_lam;
@@ -4642,7 +4645,6 @@ sub hmmValidation_conservation{
 		    my $tot_cat = scalar(@cats);
 		    my $not_detect = scalar(@aux);
 		    my $perc_cat = (($tot_cat - $not_detect)/$tot_cat)*100;
-		    print STDERR "PORCENTAGEM DE CATEGORIAS: $perc_cat\n";
 		    if($perc_cat < $category_percentage){
 			print LOG "\tStatus: Discarded - model did not detect >= $category_percentage of categories\n";
 		    	if(scalar(@aux) == 1){
