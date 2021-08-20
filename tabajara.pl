@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
 # tabajara.pl - A tool for rational design of profile HMMs
+# v1.02: Adding a routine to calculate a minimum cutoff score for profile HMMs constructed from full-length MSA.
+#        Change in model validation routine: use of domain score value to verify if the constructed model is valid.
 # v1.01: Removing unecessary comments.
 
 use strict;
@@ -19,8 +21,8 @@ foreach (@ARGV) {
 }
 
 #variables
-my $version = "1.01";
-my $last_update = "2021-05-23";
+my $version = "1.02";
+my $last_update = "2021-08-09";
 my $version_option;
 my $window_size_score;
 my $win_lam;
@@ -4300,8 +4302,8 @@ sub hmmValidation{
                     	$cat_evalue = $aux[12];
 		    }
 		    else{
-		    	$cat_score = $aux[5];
-		    	$cat_evalue = $aux[4];
+		    	$cat_score = $aux[8];
+		    	$cat_evalue = $aux[7];
 		    }
 	    	}
 	        else{		
@@ -4310,8 +4312,8 @@ sub hmmValidation{
                         $other_evalue = $aux[12];
                     }
                     else{
-		       	$other_score = $aux[5];
-                    	$other_evalue = $aux[4];
+		       	$other_score = $aux[8];
+                    	$other_evalue = $aux[7];
 		    }
 		    last;
 	    	}
@@ -4323,142 +4325,142 @@ sub hmmValidation{
         my $evalue_thre = $cat_evalue*$aux_thre;
         print LOG "\tNumber of sequences of group $category in the MSA: $num_cat\n";
 	my $aux_file;
-	    if($discart == 1){
-	    	$aux_file = $excluded."/".$hmm;
-                print LOG "\tStatus: Discarded - Top score hit does not belong to the selected group ($category)\n\n";
-		print VAL "$input_file_prefix\t0\t0.0\n";
+	if($discart == 1){
+	     $aux_file = $excluded."/".$hmm;
+             print LOG "\tStatus: Discarded - Top score hit does not belong to the selected group ($category)\n\n";
+	     print VAL "$input_file_prefix\t0\t0.0\n";
+	}
+	elsif(defined $other_score){
+	    my $delta = ($cat_score - $other_score)*0.8;
+	    $threshold = $other_score + $delta;
+	    if(($min_score > $threshold) and ($full_length eq "no")){
+	    	print LOG "\tSuggested score is lower ($threshold) than minimum score ($min_score). New suggested score = $min_score\n";
+		$threshold = $min_score;
 	    }
-	    elsif(defined $other_score){
-		my $delta = ($cat_score - $other_score)*0.8;
-		$threshold = $other_score + $delta;
-		if(($min_score > $threshold) and ($full_length eq "no")){
-		    print LOG "\tSuggested score is lower ($threshold) than minimum score ($min_score). New suggested score = $min_score\n";
-		    $threshold = $min_score;
+	    my $aux = ($other_score*100/$cat_score);
+	    if($aux <= $threshold_validation){
+	        my $count = 0;
+		open(FILE, "$analysis_dir/results.tab");
+		while(<FILE>){
+		    chomp($_);
+ 	            if($_ =~ /#/){}
+            	    else{
+                    	my @aux = split(" ", $_);
+			my $name = $aux[0];
+	                $name =~ s/>//g;
+        	        my @aux_name = split('_', $name);
+			if(lc($aux_name[0]) eq lc($category)){
+                    	    if($seq_type == 1){
+                            	if($aux[13] >= $threshold){
+				    ++$count;
+                    		}
+			    }
+                    	    else{
+                            	if($aux[8] >= $threshold){
+			   	    ++$count;
+                    		}
+		    	    }
+		   	}
+		    }
 		}
-		my $aux = ($other_score*100/$cat_score);
-		if($aux <= $threshold_validation){
-		    my $count = 0;
-		    open(FILE, "$analysis_dir/results.tab");
-		    while(<FILE>){
-		    	chomp($_);
- 	            	if($_ =~ /#/){}
-            	    	else{
-                	    my @aux = split(" ", $_);
-			    my $name = $aux[0];
-	                    $name =~ s/>//g;
-        	            my @aux_name = split('_', $name);
-			    if(lc($aux_name[0]) eq lc($category)){
-                    	    	if($seq_type == 1){
-                            	    if($aux[13] >= $threshold){
-				    	++$count;
-                    		    }
-			    	}
-                    	    	else{
-                                    if($aux[5] >= $threshold){
-			   	    	++$count;
-                    		    }
-		    	    	}
-		   	    }
-		    	}
-		    }
-		    my $perc = ($count/$num_cat)*100;
-   	            my $print_perc = sprintf("%.2f",$perc);
-        	    print VAL "$input_file_prefix\t$count\t$print_perc\n";
-		    print LOG "\tNumber of sequences of group $category detected by the model: $count\n";
-        	    print LOG "\tLowest score of group $category: $cat_score\n";
-		    print LOG "\tHighest score of the remaining sequences: $other_score\n";
-                    print LOG "\tRecommended cutoff score: $threshold\n";
-		    close(FILE);
-		    if(($count*100/$num_cat) >= $amount_detection){
-			$aux_file = $valid."/".$hmm;
-                        print LOG "\tStatus: Valid\n\n";
-		    }
-		    else{
-	                print LOG "\tStatus: Discarded - model did not detect >=$amount_detection% of the category $category of the training set\n\n";
-        	        $aux_file = $excluded."/".$hmm;
-		    }
+		my $perc = ($count/$num_cat)*100;
+   	        my $print_perc = sprintf("%.2f",$perc);
+        	print VAL "$input_file_prefix\t$count\t$print_perc\n";
+		print LOG "\tNumber of sequences of group $category detected by the model: $count\n";
+        	print LOG "\tLowest score of group $category: $cat_score\n";
+		print LOG "\tHighest score of the remaining sequences: $other_score\n";
+                print LOG "\tRecommended cutoff score: $threshold\n";
+		close(FILE);
+		if(($count*100/$num_cat) >= $amount_detection){
+		    $aux_file = $valid."/".$hmm;
+                    print LOG "\tStatus: Valid\n\n";
 		}
 		else{
-		     $aux_file = $excluded."/".$hmm;
-		     open(FILE, "$analysis_dir/results.tab");
-		     $count = 0;
-                     while(<FILE>){
-                        chomp($_);
-                        if($_ =~ /#/){}
-                        else{
-                            my @aux = split(" ", $_);
-                            my $name = $aux[0];
-                            $name =~ s/>//g;
-                            my @aux_name = split('_', $name);
-                            if(lc($aux_name[0]) eq lc($category)){
-                                if($seq_type == 1){
-                                    if($aux[13] >= $threshold){
-                                        ++$count;
-                                    }
-                                }
-                                else{
-                                    if($aux[5] >= $threshold){
-                                        ++$count;
-                                    }
-                                }
-                            }
-                        }
-                    }
-		    print LOG "\tNumber of sequences of group $category detected by the model: $count\n";
-                    print LOG "\tLowest score of group $category: $cat_score\n";
-                    print LOG "\tHighest score of the remaining sequences: $other_score\n";
-                    print LOG "\tRecommended cutoff score: $threshold\n";
-                    print LOG "\tStatus: Discarded - the highest score observed of non-selected group is >=$threshold_validation% of the lowest score of group $category\n\n";
-                    my $perc = ($count/$num_cat)*100;
-                    my $print_perc = sprintf("%.2f",$perc);
-                    print VAL "$input_file_prefix\t$count\t$print_perc\n";
-		}		
+	            print LOG "\tStatus: Discarded - model did not detect >=$amount_detection% of the category $category of the training set\n\n";
+        	    $aux_file = $excluded."/".$hmm;
+		}
 	    }
 	    else{
-		if($min_score > $threshold){
-		    print LOG "\tSuggested score is lower ($threshold) than minimum score ($min_score). New suggested score = $min_score\n";
-                    $threshold = $min_score;
-                }
-		my $count = 0;
-                open(FILE, "$analysis_dir/results.tab");
-		while(<FILE>){
+	    	$aux_file = $excluded."/".$hmm;
+		open(FILE, "$analysis_dir/results.tab");
+		$count = 0;
+                while(<FILE>){
                     chomp($_);
                     if($_ =~ /#/){}
                     else{
                     	my @aux = split(" ", $_);
-                    	my $name = $aux[0];
-                    	$name =~ s/>//g;
-                    	my @aux_name = split('_', $name);
-                    	if(lc($aux_name[0]) eq lc($category)){
-                    	    if($seq_type == 1){
+                        my $name = $aux[0];
+                        $name =~ s/>//g;
+                        my @aux_name = split('_', $name);
+                        if(lc($aux_name[0]) eq lc($category)){
+                            if($seq_type == 1){
                             	if($aux[13] >= $threshold){
-                            	   ++$count;
-                            	}
+                                    ++$count;
+                                }
                             }
                             else{
-                            	if($aux[5] >= $threshold){
-                                   ++$count;
-                            	}
-                           }
-                    	}
-                    }
-		}
-		my $perc = ($count/$num_cat)*100;
+                            	if($aux[8] >= $threshold){
+                                     ++$count;
+                                }
+                            }
+                        }
+                   }
+               }
+	        print LOG "\tNumber of sequences of group $category detected by the model: $count\n";
+                print LOG "\tLowest score of group $category: $cat_score\n";
+                print LOG "\tHighest score of the remaining sequences: $other_score\n";
+                print LOG "\tRecommended cutoff score: $threshold\n";
+                print LOG "\tStatus: Discarded - the highest score observed of non-selected group is >=$threshold_validation% of the lowest score of group $category\n\n";
+                my $perc = ($count/$num_cat)*100;
                 my $print_perc = sprintf("%.2f",$perc);
                 print VAL "$input_file_prefix\t$count\t$print_perc\n";
-		print LOG "\tNumber of sequences of group $category detected by the model: $count\n";
-                print LOG "\tLowest score of group $category: $cat_score\n";
-                print LOG "\tRecommended cutoff score: $threshold\n";
-                close(FILE);
-                if(($count*100/$num_cat) >= $amount_detection){
-                    $aux_file = $valid."/".$hmm;
-                    print LOG "\tStatus: Valid\n\n";
+	    }		
+	}
+	else{
+	    if($min_score > $threshold){
+	        print LOG "\tSuggested score is lower ($threshold) than minimum score ($min_score). New suggested score = $min_score\n";
+                $threshold = $min_score;
+            }
+	    my $count = 0;
+            open(FILE, "$analysis_dir/results.tab");
+	    while(<FILE>){
+            	chomp($_);
+                if($_ =~ /#/){}
+                else{
+                    my @aux = split(" ", $_);
+                    my $name = $aux[0];
+                    $name =~ s/>//g;
+                    my @aux_name = split('_', $name);
+                    if(lc($aux_name[0]) eq lc($category)){
+                    	if($seq_type == 1){
+                            if($aux[13] >= $threshold){
+                               ++$count;
+                            }
+                        }
+                        else{
+                            if($aux[8] >= $threshold){
+                                ++$count;
+                            }
+                        }
+                    }
                 }
-		else{
-		    print LOG "\tStatus: Discarded - model did not detect >=$amount_detection% of the category $category of the training set\n\n";
-                    $aux_file = $excluded."/".$hmm;
-		}
 	    }
+	    my $perc = ($count/$num_cat)*100;
+            my $print_perc = sprintf("%.2f",$perc);
+            print VAL "$input_file_prefix\t$count\t$print_perc\n";
+	    print LOG "\tNumber of sequences of group $category detected by the model: $count\n";
+            print LOG "\tLowest score of group $category: $cat_score\n";
+            print LOG "\tRecommended cutoff score: $threshold\n";
+            close(FILE);
+            if(($count*100/$num_cat) >= $amount_detection){
+            	$aux_file = $valid."/".$hmm;
+                print LOG "\tStatus: Valid\n\n";
+            }
+	    else{
+	    	print LOG "\tStatus: Discarded - model did not detect >=$amount_detection% of the category $category of the training set\n\n";
+                $aux_file = $excluded."/".$hmm;
+	    }
+	}
   	if($cutoff_score eq "yes"){	
 	    open(FILE, "$file");
 	    open(OUT, ">$aux_file");
@@ -4596,16 +4598,16 @@ sub hmmValidation_conservation{
 		    push @scores, $aux[13];
                 }
 	        else{
-		    $cat_score = $aux[5];
-                    $cat_evalue = $aux[4];
-		    push @scores, $aux[5];
+		    $cat_score = $aux[8];
+                    $cat_evalue = $aux[7];
+		    push @scores, $aux[8];
 		}
 		++$cat_count;
 	    }
 	}
 	close(FILE);
 	$threshold = $cat_score * 0.8;
-	if(($threshold < $min_score) and ($full_length eq "no")){
+	if($threshold < $min_score){# and ($full_length eq "no")){
 	    print LOG "\tSuggested score is lower ($threshold) than minimum score ($min_score). New suggested score = $min_score\n";
 	    $threshold = $min_score;	    
         }
@@ -4679,7 +4681,7 @@ sub hmmValidation_conservation{
                             	}
                             }
                             else{
-                            	if($aux[5] >= $threshold){
+                            	if($aux[8] >= $threshold){
                                     ++$count;
                             	}
                             }
@@ -4708,7 +4710,7 @@ sub hmmValidation_conservation{
                             }
                         }
                         else{
-                            if($aux[5] >= $threshold){
+                            if($aux[8] >= $threshold){
                             	++$count;
                             }
                         }
